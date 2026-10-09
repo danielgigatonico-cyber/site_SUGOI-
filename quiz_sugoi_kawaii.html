@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Quiz Sugoi & Kawaii! >w< ✨</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 50%, #f472b6 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .title-font {
+            font-family: 'Mochiy Pop One', sans-serif;
+        }
+
+        /* Sparkle floating particle canvas styling */
+        #fxCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Custom Kawaii Animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(3deg); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(244, 114, 182, 0.6), 0 0 30px rgba(251, 207, 232, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.9), 0 0 45px rgba(244, 114, 182, 0.8); }
+        }
+
+        @keyframes bounceWiggle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(-3deg); }
+            75% { transform: scale(1.05) rotate(3deg); }
+        }
+
+        .animate-float {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
+
+        .animate-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        .hover-wiggle:hover {
+            animation: bounceWiggle 0.4s ease-in-out infinite;
+        }
+
+        .kawaii-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border: 4px solid #f472b6;
+            box-shadow: 0 15px 35px rgba(219, 39, 119, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffe4e6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-3 sm:p-6 text-pink-900 relative">
+
+    <!-- Particle/Sakura Canvas Background -->
+    <canvas id="fxCanvas"></canvas>
+
+    <!-- Main Container Card -->
+    <div class="w-full max-w-lg kawaii-card rounded-3xl p-5 sm:p-8 relative z-10 my-auto text-center border-4 border-pink-400 shadow-2xl transition-all duration-300">
+        
+        <!-- Audio & Sakura Toggle Controls -->
+        <div class="absolute top-4 right-4 flex gap-2 z-20">
+            <button id="sakuraBtn" onclick="toggleSakura()" class="w-10 h-10 rounded-full bg-pink-200 text-pink-600 flex items-center justify-center shadow-md hover:bg-pink-300 border-2 border-pink-400 active:scale-90 transition" title="Alternar Pétalas ✨">
+                <i id="sakuraIcon" class="fa-solid fa-seedling text-sm"></i>
+            </button>
+            <button id="soundBtn" onclick="toggleSound()" class="w-10 h-10 rounded-full bg-pink-200 text-pink-600 flex items-center justify-center shadow-md hover:bg-pink-300 border-2 border-pink-400 active:scale-90 transition" title="Ativar/Desativar Som 🔔">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-sm"></i>
+            </button>
+        </div>
+
+        <!-- ============================================================
+             1. WELCOME SCREEN
+             ============================================================ -->
+        <div id="welcomeScreen" class="flex flex-col items-center justify-center space-y-5 py-4">
+            
+            <div class="inline-block bg-pink-200 text-pink-700 px-4 py-1 rounded-full text-xs font-bold tracking-wider shadow-inner border border-pink-300">
+                ✨ KAWAII ANIME TEST >w< ✨
+            </div>
+
+            <h1 class="title-font text-2xl sm:text-3xl text-pink-600 drop-shadow-md leading-tight">
+                Que Personagem de Anime Sugoi e Kawaii você é? 🌸
+            </h1>
+
+            <!-- Animated Mascot Container -->
+            <div class="relative w-40 h-40 sm:w-48 sm:h-48 my-2 animate-float">
+                <canvas id="mascotCanvas" width="200" height="200" class="mx-auto cursor-pointer" onclick="mascotClick()"></canvas>
+            </div>
+
+            <p class="text-sm sm:text-base text-pink-700 font-semibold max-w-xs">
+                Responda a este teste ultra fofo para revelar sua verdadeira alma otaku e seu tipo supremo de fofura! 💕
+            </p>
+
+            <button onclick="startQuiz()" class="animate-glow hover-wiggle w-full max-w-xs bg-gradient-to-r from-pink-400 via-pink-500 to-rose-400 text-white title-font text-lg sm:text-xl py-3.5 px-6 rounded-2xl shadow-lg border-2 border-white active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <span>Começar o Quiz!</span>
+                <i class="fa-solid fa-wand-magic-sparkles text-yellow-200"></i>
+            </button>
+        </div>
+
+        <!-- ============================================================
+             2. QUIZ SCREEN
+             ============================================================ -->
+        <div id="quizScreen" class="hidden flex-col items-center space-y-5 py-2">
+            
+            <!-- Progress Bar & Moving Kitty -->
+            <div class="w-full space-y-1">
+                <div class="flex justify-between text-xs font-bold text-pink-600 px-1">
+                    <span id="questionNumText">Pergunta 1 de 5</span>
+                    <span id="percentText">20%</span>
+                </div>
+                <div class="relative w-full bg-pink-200 h-4 rounded-full border-2 border-pink-300 overflow-visible">
+                    <div id="progressBar" class="bg-gradient-to-r from-pink-400 to-rose-500 h-full rounded-full transition-all duration-500" style="width: 20%"></div>
+                    <div id="progressMascot" class="absolute -top-3 transition-all duration-500 transform -translate-x-1/2 text-lg" style="left: 20%">
+                        🐱
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Title -->
+            <div class="bg-pink-100/90 border-2 border-pink-300 rounded-2xl p-4 w-full shadow-inner">
+                <h2 id="questionText" class="title-font text-base sm:text-lg text-pink-800">
+                    Carregando pergunta fofinha...
+                </h2>
+            </div>
+
+            <!-- Options Container -->
+            <div id="optionsContainer" class="w-full space-y-3 pt-2">
+                <!-- Options injected via JS -->
+            </div>
+        </div>
+
+        <!-- ============================================================
+             3. RESULT SCREEN
+             ============================================================ -->
+        <div id="resultScreen" class="hidden flex-col items-center space-y-4 py-2">
+            
+            <div class="inline-block bg-yellow-300 text-yellow-900 font-bold px-4 py-1 rounded-full text-xs shadow border border-yellow-400 animate-bounce">
+                🎉 SEU RESULTADO MAGICO! 🎉
+            </div>
+
+            <!-- Result Avatar Display -->
+            <div class="relative w-32 h-32 sm:w-36 sm:h-36 my-1">
+                <div id="resultEmojiBg" class="w-full h-full rounded-full bg-gradient-to-tr from-pink-300 to-rose-200 border-4 border-pink-400 flex items-center justify-center text-6xl sm:text-7xl shadow-lg animate-float">
+                    🎀
+                </div>
+            </div>
+
+            <h2 id="resultTitle" class="title-font text-xl sm:text-2xl text-pink-600 drop-shadow">
+                Tsundere Fofinha
+            </h2>
+
+            <p id="resultDesc" class="text-xs sm:text-sm text-pink-800 bg-pink-50 p-3 rounded-2xl border border-pink-200 shadow-inner">
+                Você tenta parecer forte, mas tem o coração mais puro e fofo de todos! >w<
+            </p>
+
+            <!-- Kawaii Stats Bars -->
+            <div class="w-full space-y-2 bg-pink-100/70 p-3 rounded-2xl border border-pink-200 text-left text-xs font-bold">
+                <div>
+                    <div class="flex justify-between text-pink-700 mb-0.5">
+                        <span>✨ Nível Kawaii</span>
+                        <span id="statKawaiiVal">95%</span>
+                    </div>
+                    <div class="w-full bg-pink-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="statKawaiiBar" class="bg-pink-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-purple-700 mb-0.5">
+                        <span>💖 Fator Deredere / Fofura</span>
+                        <span id="statDereVal">80%</span>
+                    </div>
+                    <div class="w-full bg-purple-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="statDereBar" class="bg-purple-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-rose-700 mb-0.5">
+                        <span>⚡ Poder Sugoi</span>
+                        <span id="statSugoiVal">90%</span>
+                    </div>
+                    <div class="w-full bg-rose-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="statSugoiBar" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2 w-full pt-2">
+                <button onclick="restartQuiz()" class="flex-1 bg-pink-400 hover:bg-pink-500 text-white font-bold py-2.5 rounded-xl border border-pink-500 shadow active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-rotate-left"></i> Refazer Quiz
+                </button>
+                <button onclick="copyResult()" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2.5 rounded-xl border border-purple-600 shadow active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-share-nodes"></i> Copiar Resultado
+                </button>
+            </div>
+
+            <div id="toast" class="hidden bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md animate-fade-in">
+                Copiado com sucesso! ✨
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* -------------------------------------------------------------
+           GAME DATA & QUESTIONS
+        ------------------------------------------------------------- */
+        const QUIZ_QUESTIONS = [
+            {
+                question: "Qual seria o seu bento/lanche perfeito para o recreio? 🍱",
+                options: [
+                    { text: "Bolinho de arroz (Onigiri) com carinha fofa de gatinho!", type: "dandere", icon: "🍙" },
+                    { text: "Bento super colorido com polvo de salsicha e frutas!", type: "genki", icon: "🐙" },
+                    { text: "O-O que importa?! Eu fiz demais e trouxe pra você, Baka!", type: "tsundere", icon: "🍱" },
+                    { text: "Doces mágicos brilhantes com glitter comestível!", type: "magical", icon: "🍰" }
+                ]
+            },
+            {
+                question: "Como você reage ao encontrar um filhotinho de gatinho fofo na rua? 🐱",
+                options: [
+                    { text: "Grito 'KYAAAH!' e abraço ele imediatamente!", type: "genki", icon: "✨" },
+                    { text: "Olho em volta com vergonha... e dou um carinho em segredo.", type: "tsundere", icon: "😳" },
+                    { text: "Fico corada(o) e sussurro bem baixinho: 'que fofo...'", type: "dandere", icon: "🌸" },
+                    { text: "Uso meus poderes mágicos para fazer um laço rosa pra ele!", type: "magical", icon: "🎀" }
+                ]
+            },
+            {
+                question: "Qual o seu bordão ou expressão secreta favorita? >w<",
+                options: [
+                    { text: "'B-Baka! Não é como se eu me importasse com você!'", type: "tsundere", icon: "💢" },
+                    { text: "'Sugoi! Minna, vamos dar o nosso melhor hoje! 🌟'", type: "genki", icon: "⚡" },
+                    { text: "'Ano... e-eu posso ficar ao seu lado...?'", type: "dandere", icon: "👉👈" },
+                    { text: "'Pelo poder do amor e da fofura suprema! ✨'", type: "magical", icon: "💖" }
+                ]
+            },
+            {
+                question: "Qual é o seu acessório indispensável no uniforme? 🎒",
+                options: [
+                    { text: "Um laço gigante cor-de-rosa no cabelo!", type: "magical", icon: "🎀" },
+                    { text: "Presilhas de cabelo super fofas e coloridas!", type: "genki", icon: "⭐" },
+                    { text: "Um broche discreto de florzinha tímida.", type: "dandere", icon: "🌼" },
+                    { text: "Um olhar fofo mas bravo que esconde meus sentimentos!", type: "tsundere", icon: "😼" }
+                ]
+            },
+            {
+                question: "Seu maior superpoder secreto no mundo dos animes é... 💫",
+                options: [
+                    { text: "Transformar qualquer situação ruim com otimismo puro!", type: "genki", icon: "☀️" },
+                    { text: "Derreter corações quando finalmente dou um sorriso carinhoso!", type: "tsundere", icon: "💘" },
+                    { text: "Curar o estresse das pessoas com meu jeito calmo e doce.", type: "dandere", icon: "🍃" },
+                    { text: "Soltar raios de corações radiantes e purificar o mal!", type: "magical", icon: "🪄" }
+                ]
+            }
+        ];
+
+        const PERSONALITIES = {
+            tsundere: {
+                title: "Tsundere Fofinha & Protetora 💢💖",
+                emoji: "😾",
+                desc: "Você finge ser bravinha(o) e distante, mas por dentro tem o coração mais puro, carinhoso e leal de todos! Seu lema é 'N-Não é como se eu gostasse de você, Baka!' >w<",
+                kawaii: 90,
+                dere: 75,
+                sugoi: 98
+            },
+            genki: {
+                title: "Genki Girl Super Energética 🌟⚡",
+                emoji: "😺",
+                desc: "Sua energia é contagiante! Você ilumina qualquer lugar com seu sorriso radiante, adora fazer amigos e nunca desiste dos seus sonhos, Nya! ✨",
+                kawaii: 98,
+                dere: 90,
+                sugoi: 95
+            },
+            dandere: {
+                title: "Dandere Tímida das Flores 🌸👉👈",
+                emoji: "🥺",
+                desc: "Você é quieta(o) e reservada(o), mas quando ganha confiança, revela um lado extremamente fofo, atencioso e inesquecível! ÓwÒ",
+                kawaii: 100,
+                dere: 95,
+                sugoi: 85
+            },
+            magical: {
+                title: "Magical Girl Brilhante & Sugoi 🪄✨",
+                emoji: "👸",
+                desc: "Você é pura magia! Sempre pronta para espalhar amor, luz e glitter por onde passa. Seu poder de fofura é lendário em todos os reinos!",
+                kawaii: 95,
+                dere: 99,
+                sugoi: 100
+            }
+        };
+
+        /* -------------------------------------------------------------
+           STATE & AUDIO ENGINE
+        ------------------------------------------------------------- */
+        let currentQuestion = 0;
+        let scores = { tsundere: 0, genki: 0, dandere: 0, magical: 0 };
+        let soundEnabled = true;
+        let sakuraEnabled = true;
+
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playCuteSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'pop') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.08); // C6
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'click') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(659.25, now); // E5
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'fanfare') {
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                    gain.gain.setValueAtTime(0.12, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + i * 0.1);
+                    osc.stop(now + i * 0.1 + 0.25);
+                });
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundIcon').className = soundEnabled ? 'fa-solid fa-volume-high text-sm' : 'fa-solid fa-volume-xmark text-sm';
+        }
+
+        function toggleSakura() {
+            sakuraEnabled = !sakuraEnabled;
+            document.getElementById('sakuraIcon').className = sakuraEnabled ? 'fa-solid fa-seedling text-sm' : 'fa-solid fa-leaf text-sm';
+        }
+
+        /* -------------------------------------------------------------
+           CANVAS PARTICLES (Sakura / Sparkles)
+        ------------------------------------------------------------- */
+        let fxCanvas, fxCtx;
+        let particles = [];
+
+        function initParticles() {
+            fxCanvas = document.getElementById('fxCanvas');
+            fxCtx = fxCanvas.getContext('2d');
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            for (let i = 0; i < 35; i++) {
+                particles.push({
+                    x: Math.random() * fxCanvas.width,
+                    y: Math.random() * fxCanvas.height,
+                    size: 4 + Math.random() * 8,
+                    speedY: 0.8 + Math.random() * 1.5,
+                    speedX: (Math.random() - 0.5) * 1,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.05,
+                    opacity: 0.4 + Math.random() * 0.5
+                });
+            }
+
+            requestAnimationFrame(renderParticles);
+        }
+
+        function resizeCanvas() {
+            fxCanvas.width = window.innerWidth;
+            fxCanvas.height = window.innerHeight;
+        }
+
+        function renderParticles() {
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+            if (sakuraEnabled) {
+                particles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += Math.sin(p.y * 0.01) + p.speedX;
+                    p.rotation += p.rotSpeed;
+
+                    if (p.y > fxCanvas.height + 20) {
+                        p.y = -20;
+                        p.x = Math.random() * fxCanvas.width;
+                    }
+
+                    fxCtx.save();
+                    fxCtx.translate(p.x, p.y);
+                    fxCtx.rotate(p.rotation);
+                    fxCtx.globalAlpha = p.opacity;
+
+                    // Petal Shape
+                    fxCtx.fillStyle = '#f472b6';
+                    fxCtx.beginPath();
+                    fxCtx.moveTo(0, 0);
+                    fxCtx.bezierCurveTo(-p.size, -p.size, -p.size * 1.5, p.size, 0, p.size * 1.5);
+                    fxCtx.bezierCurveTo(p.size * 1.5, p.size, p.size, -p.size, 0, 0);
+                    fxCtx.fill();
+
+                    fxCtx.restore();
+                });
+            }
+
+            requestAnimationFrame(renderParticles);
+        }
+
+        /* -------------------------------------------------------------
+           MASCOT CANVAS (Kawaii Animated Kitty)
+        ------------------------------------------------------------- */
+        let mascotCtx;
+        function drawMascot(bounce = 0) {
+            const canvas = document.getElementById('mascotCanvas');
+            if (!canvas) return;
+            mascotCtx = canvas.getContext('2d');
+            mascotCtx.clearRect(0, 0, 200, 200);
+
+            const cx = 100;
+            const cy = 110 + bounce;
+
+            // Ears
+            mascotCtx.fillStyle = '#f472b6';
+            mascotCtx.beginPath();
+            mascotCtx.moveTo(cx - 50, cy - 20);
+            mascotCtx.lineTo(cx - 75, cy - 80);
+            mascotCtx.lineTo(cx - 20, cy - 50);
+            mascotCtx.fill();
+
+            mascotCtx.beginPath();
+            mascotCtx.moveTo(cx + 50, cy - 20);
+            mascotCtx.lineTo(cx + 75, cy - 80);
+            mascotCtx.lineTo(cx + 20, cy - 50);
+            mascotCtx.fill();
+
+            // Inner Ears
+            mascotCtx.fillStyle = '#fbcfe8';
+            mascotCtx.beginPath();
+            mascotCtx.moveTo(cx - 45, cy - 25);
+            mascotCtx.lineTo(cx - 65, cy - 70);
+            mascotCtx.lineTo(cx - 25, cy - 48);
+            mascotCtx.fill();
+
+            mascotCtx.beginPath();
+            mascotCtx.moveTo(cx + 45, cy - 25);
+            mascotCtx.lineTo(cx + 65, cy - 70);
+            mascotCtx.lineTo(cx + 25, cy - 48);
+            mascotCtx.fill();
+
+            // Head (Round Soft Body)
+            mascotCtx.beginPath();
+            mascotCtx.arc(cx, cy, 60, 0, Math.PI * 2);
+            mascotCtx.fillStyle = '#ffffff';
+            mascotCtx.fill();
+            mascotCtx.lineWidth = 4;
+            mascotCtx.strokeStyle = '#f472b6';
+            mascotCtx.stroke();
+
+            // Blush
+            mascotCtx.fillStyle = '#f472b6';
+            mascotCtx.globalAlpha = 0.4;
+            mascotCtx.beginPath();
+            mascotCtx.ellipse(cx - 32, cy + 10, 10, 6, 0, 0, Math.PI * 2);
+            mascotCtx.ellipse(cx + 32, cy + 10, 10, 6, 0, 0, Math.PI * 2);
+            mascotCtx.fill();
+            mascotCtx.globalAlpha = 1.0;
+
+            // Eyes (>w< style or Shiny)
+            mascotCtx.lineWidth = 4;
+            mascotCtx.strokeStyle = '#831843';
+            mascotCtx.lineCap = 'round';
+
+            // Left >
+            mascotCtx.beginPath();
+            mascotCtx.moveTo(cx - 38, cy - 12);
+            mascotCtx.lineTo(cx - 24, cy - 5);
+            mascotCtx.lineTo(cx - 38, cy + 2);
+            mascotCtx.stroke();
+
+            // Right <
+            mascotCtx.beginPath();
+            mascotCtx.moveTo(cx + 38, cy - 12);
+            mascotCtx.lineTo(cx + 24, cy - 5);
+            mascotCtx.lineTo(cx + 38, cy + 2);
+            mascotCtx.stroke();
+
+            // W Mouth
+            mascotCtx.beginPath();
+            mascotCtx.arc(cx - 6, cy + 12, 6, 0, Math.PI);
+            mascotCtx.stroke();
+            mascotCtx.beginPath();
+            mascotCtx.arc(cx + 6, cy + 12, 6, 0, Math.PI);
+            mascotCtx.stroke();
+
+            // Hair Ribbon
+            mascotCtx.fillStyle = '#fb7185';
+            mascotCtx.beginPath();
+            mascotCtx.ellipse(cx - 35, cy - 48, 12, 8, -0.3, 0, Math.PI * 2);
+            mascotCtx.ellipse(cx - 15, cy - 48, 12, 8, 0.3, 0, Math.PI * 2);
+            mascotCtx.fill();
+            mascotCtx.beginPath();
+            mascotCtx.arc(cx - 25, cy - 48, 5, 0, Math.PI * 2);
+            mascotCtx.fillStyle = '#e11d48';
+            mascotCtx.fill();
+        }
+
+        function mascotClick() {
+            playCuteSound('pop');
+            drawMascot(-10);
+            setTimeout(() => drawMascot(0), 150);
+        }
+
+        /* -------------------------------------------------------------
+           QUIZ NAVIGATION & LOGIC
+        ------------------------------------------------------------- */
+        function startQuiz() {
+            playCuteSound('pop');
+            currentQuestion = 0;
+            scores = { tsundere: 0, genki: 0, dandere: 0, magical: 0 };
+
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('quizScreen').classList.add('flex');
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = QUIZ_QUESTIONS[currentQuestion];
+            const total = QUIZ_QUESTIONS.length;
+            const progress = ((currentQuestion + 1) / total) * 100;
+
+            document.getElementById('questionNumText').innerText = `Pergunta ${currentQuestion + 1} de ${total}`;
+            document.getElementById('percentText').innerText = `${Math.round(progress)}%`;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressMascot').style.left = `${progress}%`;
+
+            document.getElementById('questionText').innerText = q.question;
+
+            const optionsDiv = document.getElementById('optionsContainer');
+            optionsDiv.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full bg-white hover:bg-pink-100/80 text-pink-900 border-2 border-pink-300 hover:border-pink-500 rounded-2xl p-3 sm:p-3.5 text-left text-xs sm:text-sm font-bold shadow-sm transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-3';
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-full bg-pink-200 text-pink-700 flex items-center justify-center text-lg flex-shrink-0 border border-pink-300">
+                        ${opt.icon}
+                    </span>
+                    <span>${opt.text}</span>
+                `;
+                btn.onclick = () => selectOption(opt.type);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function selectOption(type) {
+            playCuteSound('click');
+            scores[type]++;
+
+            if (currentQuestion < QUIZ_QUESTIONS.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            playCuteSound('fanfare');
+
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('flex');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            document.getElementById('resultScreen').classList.add('flex');
+
+            // Find dominant personality
+            let winningType = 'tsundere';
+            let maxScore = -1;
+
+            for (const key in scores) {
+                if (scores[key] > maxScore) {
+                    maxScore = scores[key];
+                    winningType = key;
+                }
+            }
+
+            const res = PERSONALITIES[winningType];
+
+            document.getElementById('resultEmojiBg').innerText = res.emoji;
+            document.getElementById('resultTitle').innerText = res.title;
+            document.getElementById('resultDesc').innerText = res.desc;
+
+            // Animate Stats Bars
+            setTimeout(() => {
+                document.getElementById('statKawaiiBar').style.width = `${res.kawaii}%`;
+                document.getElementById('statKawaiiVal').innerText = `${res.kawaii}%`;
+
+                document.getElementById('statDereBar').style.width = `${res.dere}%`;
+                document.getElementById('statDereVal').innerText = `${res.dere}%`;
+
+                document.getElementById('statSugoiBar').style.width = `${res.sugoi}%`;
+                document.getElementById('statSugoiVal').innerText = `${res.sugoi}%`;
+            }, 200);
+        }
+
+        function restartQuiz() {
+            playCuteSound('click');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('flex');
+            
+            // Reset stats bar width
+            document.getElementById('statKawaiiBar').style.width = '0%';
+            document.getElementById('statDereBar').style.width = '0%';
+            document.getElementById('statSugoiBar').style.width = '0%';
+
+            startQuiz();
+        }
+
+        function copyResult() {
+            playCuteSound('pop');
+            const title = document.getElementById('resultTitle').innerText;
+            const textToCopy = `✨ Eu fiz o Quiz Sugoi & Kawaii e descobri que sou: ${title}! Faça você também! >w< 🌸`;
+
+            // Standard fallback clipboard copy
+            const dummy = document.createElement('textarea');
+            document.body.appendChild(dummy);
+            dummy.value = textToCopy;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2500);
+        }
+
+        /* -------------------------------------------------------------
+           INITIALIZATION
+        ------------------------------------------------------------- */
+        window.onload = function() {
+            initParticles();
+            drawMascot(0);
+        };
+    </script>
+</body>
+</html>
